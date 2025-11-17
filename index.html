@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0072CE">
+  <title>Decathlon — Online Exclusive</title>
+  <style>
+    :root{
+      --bg:#FFFFFF;
+      --panel:#F8F8F8;
+      --text:#1A1A1A;
+      --muted:#666666;
+      --accent:#0072CE;
+      --accent-2:#005B9A;
+      --radius:14px;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; padding:20px;
+    }
+
+    .container{max-width:1200px; margin:0 auto}
+    header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; border-bottom:1px solid #EEEEEE; padding-bottom:12px;}
+    .brand{display:flex; gap:12px; align-items:center}
+    .logo{width:52px; height:52px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); border-radius:12px; display:grid; place-items:center; font-weight:800; color:#fff; font-size:20px}
+    h1{font-size:20px; margin:0; font-weight:900; color:var(--text);}
+
+    /* Tabs */
+    .tabs{display:flex; gap:8px; margin:12px 0; flex-wrap:wrap; border-bottom:2px solid #EEE;}
+    .tab{padding:8px 12px; border-radius:8px 8px 0 0; background:transparent; border:0; cursor:pointer; font-weight:700; color:var(--muted); transition:color .18s}
+    .tab:hover:not(.active){color:var(--text);}
+    .tab.active{color:var(--accent); border-bottom:2px solid var(--accent); margin-bottom:-2px;}
+
+    /* Grid - mobile-first: 1 column by default */
+    .grid{display:grid; gap:14px; grid-template-columns:1fr}
+    @media(min-width:640px){ .grid{ grid-template-columns:repeat(2,1fr) } }
+    @media(min-width:1000px){ .grid{ grid-template-columns:repeat(3,1fr) } }
+    @media(min-width:1200px){ .grid{ grid-template-columns:repeat(4,1fr) } }
+
+    .card{background:var(--panel); border-radius:14px; overflow:hidden; border:1px solid #EDEDED; cursor:pointer; transition:transform .18s ease, box-shadow .18s ease; display:flex; flex-direction:column}
+    .card:focus{outline:3px solid rgba(0,114,206,0.14)}
+    .card:hover{
+      transform:translateY(-6px);
+      box-shadow: 0 10px 32px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(0,114,206,0.04);
+    }
+
+    /* disable heavy hover effects on touch devices */
+    @media (hover: none) and (pointer: coarse) {
+      .card:hover { transform: none; box-shadow: none; }
+    }
+
+    .media{position:relative; padding-top:68%; overflow:hidden; background:var(--panel);}
+    .media img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; transition:filter .35s ease, transform .35s ease}
+
+    .media .placeholder{
+      filter:blur(8px) saturate(.95) contrast(.99); transform:scale(1.02);
+      background: linear-gradient(90deg, #F8F8F8 25%, #EFEFEF 50%, #F8F8F8 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+    }
+    @keyframes shimmer {
+      0% {background-position: 200% 0;}
+      100% {background-position: -200% 0;}
+    }
+
+    /* reduce placeholder effects for small screens to save GPU */
+    @media (max-width:640px){
+      .media .placeholder { filter:none; transform:none; background:#F6F6F6; animation:none; }
+    }
+
+    .info{padding:12px 12px 14px; display:flex; gap:10px; align-items:center; justify-content:space-between}
+    .meta{display:flex; flex-direction:column}
+    .title{font-weight:900; font-size:15px; margin:0 0 4px; color:var(--text)}
+    .code{font-size:12px; color:var(--muted); font-weight:600}
+    .price{font-weight:900; color:var(--accent); font-size:16px}
+
+    .empty{padding:40px; text-align:center; color:var(--muted)}
+
+    /* Modal */
+    .modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.9); z-index:60; padding:12px; backdrop-filter: blur(4px)}
+    .modal.open{display:flex}
+    .gallery{width:100%; max-width:1100px; background:var(--bg); border-radius:14px; overflow:hidden; display:grid; grid-template-columns:1fr 340px; box-shadow: 0 10px 40px rgba(0,0,0,0.4)}
+    @media(max-width:880px){ .gallery{grid-template-columns:1fr} }
+
+    /* flexible viewer: use viewport-relative min-height on small screens */
+    .viewer{position:relative; background:#000; display:flex; align-items:center; justify-content:center; min-height:60vh; padding:16px}
+    @media(min-width:880px){ .viewer{ min-height:400px; padding:20px } }
+    .viewer img{max-width:100%; max-height:calc(85vh - 40px); object-fit:contain}
+
+    /* make swipe area allow vertical scrolling when appropriate */
+    .viewer { touch-action: pan-y; -ms-touch-action: pan-y; }
+
+    .rightpane{padding:16px; color:var(--muted); display:flex; flex-direction:column; gap:12px}
+    .close{position:absolute; right:12px; top:12px; background:rgba(255,255,255,0.12); border:0; color:#fff; font-weight:800; font-size:20px; cursor:pointer; width:36px; height:36px; border-radius:50%; display:grid; place-items:center; transition:background .18s}
+    .close:hover{background:var(--accent-2)}
+
+    .thumbs{display:flex; flex-direction:column; gap:10px; overflow:auto}
+    .thumb{width:100%; height:82px; border-radius:10px; overflow:hidden; flex-shrink:0; cursor:pointer; border:3px solid transparent; transition:border-color .18s}
+    .thumb img{width:100%; height:100%; object-fit:cover}
+    .thumb.active{border-color:var(--accent)}
+    .thumb:hover:not(.active){border-color:rgba(0,114,206,0.3)}
+
+    @media(max-width:880px){ .thumbs{flex-direction:row; padding:8px 0; } .thumb{width:100px; height:68px} }
+
+    #modalName{font-weight:900; color:var(--text); font-size:20px}
+    #modalCode{margin-top:6px; color:var(--muted); font-weight:700}
+    #modalPrice{margin-top:10px; font-weight:900; color:var(--accent); font-size:20px}
+
+    .muted{color:var(--muted)}
+    footer{margin-top:18px; color:var(--muted); font-size:13px; text-align:center}
+
+    /* Respect reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      .card, .card:hover, .media img, .viewer img { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">D</div>
+        <div>
+          <h1>Decathlon — Online Exclusive</h1>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Categories">
+      <button class="tab active" data-cat="Men" role="tab" aria-selected="true">Men</button>
+      <button class="tab" data-cat="Women" role="tab" aria-selected="false">Women</button>
+      <button class="tab" data-cat="Kids" role="tab" aria-selected="false">Kids</button>
+    </nav>
+
+    <main>
+      <section id="grid" class="grid" aria-live="polite"></section>
+      <div id="empty" class="empty" style="display:none">No products in this category.</div>
+    </main>
+
+    <footer>Tip: Pre-generate multiple sizes and serve WebP/AVIF via CDN for fastest load.</footer>
+  </div>
+
+  <div id="modal" class="modal" role="dialog" aria-modal="true">
+    <div class="gallery" role="document">
+      <div class="viewer">
+        <button class="close" id="closeBtn" aria-label="Close gallery">✕</button>
+        <img id="viewerImg" alt="Selected product image">
+      </div>
+      <div class="rightpane">
+        <div>
+          <div id="modalName" class="product-name"></div>
+          <div id="modalCode"></div>
+          <div id="modalPrice"></div>
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:700; color:var(--muted); margin-bottom:8px">More images</div>
+          <div id="thumbs" class="thumbs" role="list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * Sample dataset. Each product has:
+     * - images[] (we assume these URLs include '/1600/1100' sizes for this demo)
+     * - placeholder (tiny image)
+     *
+     * In production, replace with your real image URLs and ideally provide AVIF/WebP variants.
+     */
+    const products = [
+      {id:1, code:'D-MEN-001', name:"Men's sweat shirt", price:2499, category:"Men",
+        images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8801260/img1.avif",
+,"https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8801260/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8801260/img4.avif"],
+        placeholder:"https://picsum.photos/id/1025/80/55"},
+      {id:2, code:'D-MEN-002', name:"Men's Trail Backpack 30L", price:3599, category:"Men",
+        images:["https://picsum.photos/id/1041/1600/1100","https://picsum.photos/id/1042/1600/1100"],
+        placeholder:"https://picsum.photos/id/1041/80/55"},
+      {id:3, code:'D-WOM-003', name:"Women's Yoga Mat — Comfort Pro", price:899, category:"Women",
+        images:["https://picsum.photos/id/1016/1600/1100","https://picsum.photos/id/1018/1600/1100"],
+        placeholder:"https://picsum.photos/id/1016/80/55"},
+      {id:4, code:'D-WOM-004', name:"Women's Trail Shoes — GripMax", price:2799, category:"Women",
+        images:["https://picsum.photos/id/100/1600/1100","https://picsum.photos/id/1010/1600/1100"],
+        placeholder:"https://picsum.photos/id/100/80/55"},
+      {id:5, code:'D-KID-005', name:"Kids' Football — Mini", price:499, category:"Kids",
+        images:["https://picsum.photos/id/1005/1600/1100","https://picsum.photos/id/1012/1600/1100"],
+        placeholder:"https://picsum.photos/id/1005/80/55"}
+    ];
+
+    const grid = document.getElementById('grid');
+    const empty = document.getElementById('empty');
+    const tabs = Array.from(document.querySelectorAll('.tab'));
+    let activeCategory = 'Men';
+
+    /**
+     * Build a responsive srcset string from a base URL that contains '/1600/1100'.
+     * For production, you should store proper variants or use a CDN that emits srcset.
+     */
+    function buildSrcsetFrom1600(url){
+      if(!url) return '';
+      // naive replace - works with the picsum URLs used in the sample dataset
+      const w1600 = url;
+      const w800 = url.replace('/1600/1100','/800/550');
+      const w400 = url.replace('/1600/1100','/400/275');
+      return `${w400} 400w, ${w800} 800w, ${w1600} 1600w`;
+    }
+
+    function renderCategory(cat){
+      activeCategory = cat;
+      tabs.forEach(t=>{
+        const isActive = t.dataset.cat === cat;
+        t.classList.toggle('active', isActive);
+        t.setAttribute('aria-selected', isActive);
+      });
+
+      const list = products.filter(p=>p.category===cat);
+      grid.innerHTML = '';
+      if(!list.length){ empty.style.display='block'; return; }
+      empty.style.display='none';
+
+      for(const p of list){
+        const card = document.createElement('article');
+        card.className='card';
+        card.tabIndex=0;
+        card.setAttribute('role','button');
+        card.setAttribute('aria-label', `${p.name}, ${p.code}`);
+
+        const media = document.createElement('div'); media.className='media';
+        const img = document.createElement('img');
+        img.alt = p.name;
+        img.className='placeholder';
+        img.src = p.placeholder;
+        img.dataset.src = p.images[0];
+        img.dataset.srcset = buildSrcsetFrom1600(p.images[0]);
+        img.sizes = "(max-width:600px) 100vw, (max-width:1000px) 50vw, 33vw";
+        img.loading = 'lazy';
+        media.appendChild(img);
+
+        const info = document.createElement('div'); info.className='info';
+        const left = document.createElement('div'); left.className='meta';
+        const title = document.createElement('div'); title.className='title'; title.textContent = p.name;
+        const code = document.createElement('div'); code.className='code'; code.textContent = p.code || '';
+        const price = document.createElement('div'); price.className='price'; price.textContent = `₹${p.price.toLocaleString('en-IN')}`;
+        left.appendChild(title); left.appendChild(code);
+        info.appendChild(left); info.appendChild(price);
+
+        card.appendChild(media); card.appendChild(info);
+        grid.appendChild(card);
+
+        const open = ()=> openGallery(p);
+        card.addEventListener('click', open);
+        card.addEventListener('keydown', e=>{
+          // open on Enter or Space (Space can be ' ' or 'Space' depending on browser)
+          if(e.key === 'Enter' || e.key === ' ' || e.code === 'Space'){
+            e.preventDefault();
+            open();
+          }
+        });
+      }
+
+      runLazyLoad();
+    }
+
+    // Tabs behavior
+    tabs.forEach(t=>t.addEventListener('click', ()=>renderCategory(t.dataset.cat)));
+
+    // Lazy loading images (IntersectionObserver). Also applies srcset when loaded.
+    function runLazyLoad(){
+      const imgs = Array.from(document.querySelectorAll('img[data-src]'));
+      if('IntersectionObserver' in window){
+        const io = new IntersectionObserver((entries, obs)=>{
+          for(const e of entries){
+            if(e.isIntersecting){
+              const img = e.target;
+              if(img.dataset.src){
+                img.src = img.dataset.src;
+                if(img.dataset.srcset) img.srcset = img.dataset.srcset;
+                img.onload = ()=> img.classList.remove('placeholder');
+                img.removeAttribute('data-src');
+                img.removeAttribute('data-srcset');
+              }
+              obs.unobserve(img);
+            }
+          }
+        },{rootMargin:'250px 0px'});
+        imgs.forEach(i=>io.observe(i));
+      } else {
+        imgs.forEach(img=>{
+          img.src = img.dataset.src;
+          if(img.dataset.srcset) img.srcset = img.dataset.srcset;
+          img.onload = ()=> img.classList.remove('placeholder');
+          img.removeAttribute('data-src');
+          img.removeAttribute('data-srcset');
+        });
+      }
+    }
+
+    // Modal elements
+    const modal = document.getElementById('modal');
+    const viewerImg = document.getElementById('viewerImg');
+    const thumbs = document.getElementById('thumbs');
+    const modalName = document.getElementById('modalName');
+    const modalPrice = document.getElementById('modalPrice');
+    const modalCode = document.getElementById('modalCode');
+    const closeBtn = document.getElementById('closeBtn');
+
+    let currentImages = [];
+    let currentIndex = 0;
+
+    function openGallery(product){
+      modal.classList.add('open');
+      modalName.textContent = product.name;
+      modalPrice.textContent = `₹${product.price.toLocaleString('en-IN')}`;
+      modalCode.textContent = `Code: ${product.code || '—'}`;
+
+      currentImages = product.images.slice();
+      currentIndex = 0;
+      setViewerImage(currentImages[currentIndex]);
+
+      thumbs.innerHTML = '';
+      currentImages.forEach((src, i)=>{
+        const t = document.createElement('div'); t.className='thumb'; t.setAttribute('role','listitem');
+        const im = document.createElement('img');
+        // small thumb variant
+        im.src = src.replace('/1600/1100','/400/275');
+        im.alt = `${product.name} image ${i+1}`;
+        t.appendChild(im); thumbs.appendChild(t);
+        t.addEventListener('click', ()=>{ goToImage(i); });
+        if(i===0) t.classList.add('active');
+      });
+
+      // set focus for keyboard users
+      closeBtn.focus();
+
+      enableSwipe();
+    }
+
+    function setViewerImage(src){
+      viewerImg.src = src;
+      // set responsive srcset for viewer if possible
+      viewerImg.srcset = buildSrcsetFrom1600(src);
+      viewerImg.sizes = "(max-width:600px) 100vw, 70vw";
+      highlightThumb(currentIndex);
+    }
+
+    function highlightThumb(i){
+      Array.from(thumbs.children).forEach((c,idx)=> {
+        c.classList.toggle('active', idx===i);
+        if (idx === i) {
+          // scroll into view but avoid abrupt jumps on reduced-motion
+          c.scrollIntoView({behavior: (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'), inline: "nearest", block: "nearest"});
+        }
+      });
+    }
+
+    function goToImage(i){ currentIndex = (i + currentImages.length) % currentImages.length; setViewerImage(currentImages[currentIndex]); }
+    function nextImage(){ goToImage(currentIndex+1); }
+    function prevImage(){ goToImage(currentIndex-1); }
+
+    closeBtn.addEventListener('click', closeGallery);
+
+    modal.addEventListener('click', e=>{ if(e.target === modal) closeGallery(); });
+    window.addEventListener('keydown', e=>{
+      if(modal.classList.contains('open')){
+        if(e.key === 'Escape') closeGallery();
+        if(e.key === 'ArrowRight') nextImage();
+        if(e.key === 'ArrowLeft') prevImage();
+      }
+    });
+
+    function closeGallery(){ modal.classList.remove('open'); viewerImg.src=''; viewerImg.srcset=''; currentImages = []; disableSwipe(); }
+
+    // Swipe handling (touch)
+    let touchStartX = 0, touchStartY = 0, touchMoveX = 0, touchMoveY = 0;
+    const SWIPE_THRESHOLD = 40;
+
+    function handleTouchStart(e){
+      if(!e.touches || !e.touches.length) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchMoveX = 0; touchMoveY = 0;
+    }
+    function handleTouchMove(e){
+      if(!e.touches || !e.touches.length) return;
+      touchMoveX = e.touches[0].clientX - touchStartX;
+      touchMoveY = e.touches[0].clientY - touchStartY;
+      if (Math.abs(touchMoveX) > 10 && Math.abs(touchMoveX) > Math.abs(touchMoveY)) {
+        // when mostly horizontal, prevent native vertical scroll (improves swipe UX)
+        e.preventDefault();
+      }
+    }
+    function handleTouchEnd(){
+      const dx = touchMoveX, dy = touchMoveY;
+      if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD){
+        if(dx < 0) nextImage();
+        else prevImage();
+      }
+      touchStartX = touchStartY = touchMoveX = touchMoveY = 0;
+    }
+
+    function enableSwipe(){
+      const v = document.querySelector('.viewer');
+      if(!v._swipeEnabled){
+        v.addEventListener('touchstart', handleTouchStart, {passive:false});
+        v.addEventListener('touchmove', handleTouchMove, {passive:false});
+        v.addEventListener('touchend', handleTouchEnd, {passive:false});
+        v._swipeEnabled = true;
+      }
+    }
+    function disableSwipe(){
+      const v = document.querySelector('.viewer');
+      if(v && v._swipeEnabled){
+        v.removeEventListener('touchstart', handleTouchStart);
+        v.removeEventListener('touchmove', handleTouchMove);
+        v.removeEventListener('touchend', handleTouchEnd);
+        v._swipeEnabled = false;
+      }
+    }
+
+    // initial render
+    renderCategory(activeCategory);
+  </script>
+</body>
+</html>

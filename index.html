@@ -26,11 +26,8 @@
     header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; border-bottom:1px solid #EEEEEE; padding-bottom:12px;}
     .brand{display:flex; gap:12px; align-items:center}
     .logo{width:52px; height:52px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); border-radius:12px; display:grid; place-items:center; font-weight:800; color:#fff; font-size:20px}
-    h1{font-size:20px; margin:0; font-weight:900; color:var(--text);}
+    h1{font-size:20px; margin:0; font-weight:900; color:var(--text);} 
 
-    /* =============================
-       UPDATED GRID (2 per row on mobile)
-       ============================= */
     .grid{display:grid; gap:14px; grid-template-columns:repeat(2,1fr)}
     @media(max-width:360px){ 
       .grid{grid-template-columns:1fr} 
@@ -88,37 +85,8 @@
 
     .empty{padding:40px; text-align:center; color:var(--muted)}
 
-    /* Modal */
-    .modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.9); z-index:60; padding:12px; backdrop-filter: blur(4px)}
-    .modal.open{display:flex}
-    .gallery{width:100%; max-width:1100px; background:var(--bg); border-radius:14px; overflow:hidden; display:grid; grid-template-columns:1fr 340px; box-shadow: 0 10px 40px rgba(0,0,0,0.4)}
-    @media(max-width:880px){ .gallery{grid-template-columns:1fr} }
-
-    .viewer{position:relative; background:#000; display:flex; align-items:center; justify-content:center; min-height:60vh; padding:16px}
-    @media(min-width:880px){ .viewer{ min-height:400px; padding:20px } }
-    .viewer img{max-width:100%; max-height:calc(85vh - 40px); object-fit:contain}
-
-    .rightpane{padding:16px; color:var(--muted); display:flex; flex-direction:column; gap:12px}
-    .close{position:absolute; right:12px; top:12px; background:rgba(255,255,255,0.12); border:0; color:#fff; font-weight:800; font-size:20px; cursor:pointer; width:36px; height:36px; border-radius:50%; display:grid; place-items:center; transition:background .18s}
-    .close:hover{background:var(--accent-2)}
-
-    .thumbs{display:flex; flex-direction:column; gap:10px; overflow:auto}
-    .thumb{width:100%; height:82px; border-radius:10px; overflow:hidden; flex-shrink:0; cursor:pointer; border:3px solid transparent; transition:border-color .18s}
-    .thumb img{width:100%; height:100%; object-fit:cover}
-    .thumb.active{border-color:var(--accent)}
-    .thumb:hover:not(.active){border-color:rgba(0,114,206,0.3)}
-
-    @media(max-width:880px){ .thumbs{flex-direction:row; padding:8px 0; } .thumb{width:100px; height:68px} }
-
-    #modalName{font-weight:900; color:var(--text); font-size:20px}
-    #modalCode{margin-top:6px; color:var(--muted); font-weight:700}
-    #modalPrice{margin-top:10px; font-weight:900; color:var(--accent); font-size:20px}
-
-    .muted{color:var(--muted)}
-    footer{margin-top:18px; color:var(--muted); font-size:13px; text-align:center}
-
     @media (prefers-reduced-motion: reduce) {
-      .card, .card:hover, .media img, .viewer img { transition: none !important; animation: none !important; }
+      .card, .card:hover, .media img { transition: none !important; animation: none !important; }
     }
   </style>
 </head>
@@ -146,135 +114,85 @@
   <footer></footer>
 </div>
 
-<!-- Modal -->
-<div id="modal" class="modal" role="dialog" aria-modal="true">
-  <div class="gallery" role="document">
-    <div class="viewer">
-      <button class="close" id="closeBtn" aria-label="Close gallery">✕</button>
-      <img id="viewerImg" alt="Selected product image">
-    </div>
-    <div class="rightpane">
-      <div>
-        <div id="modalName" class="product-name"></div>
-        <div id="modalCode"></div>
-        <div id="modalPrice"></div>
-      </div>
-      <div style="flex:1">
-        <div style="font-weight:700; color:var(--muted); margin-bottom:8px">More images</div>
-        <div id="thumbs" class="thumbs" role="list"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
+  // NOTE: Each product now includes a `link` field that points to the Decathlon product page.
+  // The click and key handlers open that link in a new tab.
   const products = [
-    {id:1, code:'8801260', name:"Men's sweat shirt", price:2499, category:"Men",
+    {id:1, code:'8801260', name:"Men's sweat shirt", price:2499, category:"Men", link: 'https://www.decathlon.in/p/8801260',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8801260/img1.avif",
       "https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8801260/img3.avif",
       "https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8801260/img4.avif"],
       placeholder:"https://picsum.photos/id/1025/80/55"},
-    {id:2, code:'8749769', name:"Men's warm fleece", price:2499, category:"Men",
+    {id:2, code:'8749769', name:"Men's warm fleece", price:2499, category:"Men", link: 'https://www.decathlon.in/p/8749769',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8749769/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8749769/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8749769/img4.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:3, code:'8758029', name:"Men's hiking fleece", price:1599, category:"Men",
+    {id:3, code:'8758029', name:"Men's hiking fleece", price:1599, category:"Men", link: 'https://www.decathlon.in/p/8758029',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8758029/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8758029/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8758029/img4.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:4, code:'8771954', name:"Men's ultra warm fleece", price:3999, category:"Men",
+    {id:4, code:'8771954', name:"Men's ultra warm fleece", price:3999, category:"Men", link: 'https://www.decathlon.in/p/8771954',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8771954/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8771954/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8771954/img4.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:5, code:'8930917', name:"Men's warm sherpa", price:3999, category:"Men",
+    {id:5, code:'8930917', name:"Men's warm sherpa", price:3999, category:"Men", link: 'https://www.decathlon.in/p/8930917',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8930917/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8930917/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8930917/img4.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:6, code:'8810807', name:"Men's hybrid sweat shirt", price:2499, category:"Men",
+    {id:6, code:'8810807', name:"Men's hybrid sweat shirt", price:2499, category:"Men", link: 'https://www.decathlon.in/p/8810807',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8810807/img2.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8810807/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8810807/img4.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:7, code:'8930920', name:"Men's warm sherpa", price:3999, category:"Men",
+    {id:7, code:'8930920', name:"Men's warm sherpa", price:3999, category:"Men", link: 'https://www.decathlon.in/p/8930920',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8930920/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8930920/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8930920/img4.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      // {id:8, code:'8930920', name:"Men's Trail Backpack 30L", price:3599, category:"Men",
-      // images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8930920/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8930920/img2.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8930920/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8930920/img4.avif"],
-      // placeholder:"https://picsum.photos/id/1041/80/55"},
-       {id:9, code:'8958316', name:"Men's hiking fleece hail zip", price:1999, category:"Men",
+    {id:9, code:'8958316', name:"Men's hiking fleece hail zip", price:1999, category:"Men", link: 'https://www.decathlon.in/p/8958316',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8958316/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8958316/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/mens/8958316/img4.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// <--------- WOMENS ------>>
-
-
-
-      {id:3, code:'8928723', name:"warm hiking fleece", price:4999, category:"Women",
+    // Women
+    {id:101, code:'8928723', name:"warm hiking fleece", price:4999, category:"Women", link: 'https://www.decathlon.in/p/8928723',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/8928723/img2.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/8928723/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/8928723/img4.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:2, code:'8947537', name:"hiking fleece", price:2499, category:"Women",
+    {id:102, code:'8947537', name:"hiking fleece", price:2499, category:"Women", link: 'https://www.decathlon.in/p/8947537',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/8947537/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/8947537/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/8947537/img4.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:1, code:'8817273', name:"hiking fleece", price:1799, category:"Women",
+    {id:103, code:'8817273', name:"hiking fleece", price:1799, category:"Women", link: 'https://www.decathlon.in/p/8817273',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8817273/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8817273/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8817273/img2.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:4, code:'8829874', name:"Sherpa SH500", price:3999, category:"Women",
+    {id:104, code:'8829874', name:"Sherpa SH500", price:3999, category:"Women", link: 'https://www.decathlon.in/p/8829874',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8829874/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8829874/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8829874/img2.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:5, code:'8891686', name:"Sherpa SH500", price:3999, category:"Women",
+    {id:105, code:'8891686', name:"Sherpa SH500", price:3999, category:"Women", link: 'https://www.decathlon.in/p/8891686',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8891686/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8891686/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8891686/img2.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:6, code:'8842103', name:"Warm hiking fleece", price:3299, category:"Women",
+    {id:106, code:'8842103', name:"Warm hiking fleece", price:3299, category:"Women", link: 'https://www.decathlon.in/p/8842103',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8842103/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8842103/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8842103/img2.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:7, code:'8936164', name:"Women  long fleece", price:1999, category:"Women",
+    {id:107, code:'8936164', name:"Women long fleece", price:1999, category:"Women", link: 'https://www.decathlon.in/p/8936164',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8936164/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8936164/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8936164/img2.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:8, code:'8954747', name:"Sherpa hiking fleece", price:1999, category:"Women",
+    {id:108, code:'8954747', name:"Sherpa hiking fleece", price:1999, category:"Women", link: 'https://www.decathlon.in/p/8954747',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8954747/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8954747/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8954747/img2.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:9, code:'8958313', name:"Sherpa hiking fleece", price:1999, category:"Women",
+    {id:109, code:'8958313', name:"Sherpa hiking fleece", price:1999, category:"Women", link: 'https://www.decathlon.in/p/8958313',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8958313/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8958313/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8958313/img2.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:10, code:'8966138', name:"hiking fleece", price:1599, category:"Women",
+    {id:110, code:'8966138', name:"hiking fleece", price:1599, category:"Women", link: 'https://www.decathlon.in/p/8966138',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8966138/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8966138/img3.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/womens/N8966138/img2.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
 
-
-
-
-
-
-
-// <--------- KIDS ------>>
-
-
- {id:1, code:'8817042', name:"kids warm sherpa", price:1999, category:"Kids",
+    // Kids
+    {id:201, code:'8817042', name:"kids warm sherpa", price:1999, category:"Kids", link: 'https://www.decathlon.in/p/8817042',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/8817042/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/8817042/img2.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/8817042/img3.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-   {id:2, code:'8944474', name:"kids sherpa", price:1299, category:"Kids",
+    {id:202, code:'8944474', name:"kids sherpa", price:1299, category:"Kids", link: 'https://www.decathlon.in/p/8944474',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/8944474/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/8944474/img2.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/8944474/img3.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:3, code:'8604002', name:"kids warm fleece 2-6", price:999, category:"Kids",
+    {id:203, code:'8604002', name:"kids warm fleece 2-6", price:999, category:"Kids", link: 'https://www.decathlon.in/p/8604002',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/N8604002/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/N8604002/img2.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/N8604002/img3.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:4, code:'8927462', name:"kids warm fleece 7-15", price:1299, category:"Kids",
+    {id:204, code:'8927462', name:"kids warm fleece 7-15", price:1299, category:"Kids", link: 'https://www.decathlon.in/p/8927462',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/N8927462/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/N8927462/img2.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/N8927462/img3.avif"],
       placeholder:"https://picsum.photos/id/1041/80/55"},
-      {id:5, code:'8944467', name:"kids warm fleece 2-6", price:999, category:"Kids",
+    {id:205, code:'8944467', name:"kids warm fleece 2-6", price:999, category:"Kids", link: 'https://www.decathlon.in/p/8944467',
       images:["https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/N8944467/img1.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/N8944467/img2.avif","https://cdn.jsdelivr.net/gh/rajureddie/Decathlon-images@main/kids/N8944467/img3.avif"],
-      placeholder:"https://picsum.photos/id/1041/80/55"},
-      
+      placeholder:"https://picsum.photos/id/1041/80/55"}
   ];
 
   const grid = document.getElementById('grid');
@@ -307,7 +225,7 @@
       const card = document.createElement('article');
       card.className='card';
       card.tabIndex=0;
-      card.setAttribute('role','button');
+      card.setAttribute('role','link');
       card.setAttribute('aria-label', `${p.name}, ${p.code}`);
 
       const media = document.createElement('div'); media.className='media';
@@ -332,7 +250,12 @@
       card.appendChild(media); card.appendChild(info);
       grid.appendChild(card);
 
-      const open = ()=> openGallery(p);
+      // Open Decathlon product page in a new tab
+      const open = ()=>{
+        if(p.link){
+          window.open(p.link, '_blank');
+        }
+      };
       card.addEventListener('click', open);
       card.addEventListener('keydown', e=>{
         if(e.key === 'Enter' || e.key === ' ' || e.code === 'Space'){
@@ -374,121 +297,6 @@
         img.removeAttribute('data-src');
         img.removeAttribute('data-srcset');
       });
-    }
-  }
-
-  const modal = document.getElementById('modal');
-  const viewerImg = document.getElementById('viewerImg');
-  const thumbs = document.getElementById('thumbs');
-  const modalName = document.getElementById('modalName');
-  const modalPrice = document.getElementById('modalPrice');
-  const modalCode = document.getElementById('modalCode');
-  const closeBtn = document.getElementById('closeBtn');
-
-  let currentImages = [];
-  let currentIndex = 0;
-
-  function openGallery(product){
-    modal.classList.add('open');
-    modalName.textContent = product.name;
-    modalPrice.textContent = `₹${product.price.toLocaleString('en-IN')}`;
-    modalCode.textContent = `Code: ${product.code || '—'}`;
-
-    currentImages = product.images.slice();
-    currentIndex = 0;
-    setViewerImage(currentImages[currentIndex]);
-
-    thumbs.innerHTML = '';
-    currentImages.forEach((src, i)=>{
-      const t = document.createElement('div'); t.className='thumb'; t.setAttribute('role','listitem');
-      const im = document.createElement('img');
-      im.src = src.replace('/1600/1100','/400/275');
-      im.alt = `${product.name} image ${i+1}`;
-      t.appendChild(im); thumbs.appendChild(t);
-      t.addEventListener('click', ()=>{ goToImage(i); });
-      if(i===0) t.classList.add('active');
-    });
-
-    closeBtn.focus();
-
-    enableSwipe();
-  }
-
-  function setViewerImage(src){
-    viewerImg.src = src;
-    viewerImg.srcset = buildSrcsetFrom1600(src);
-    viewerImg.sizes = "(max-width:600px) 100vw, 70vw";
-    highlightThumb(currentIndex);
-  }
-
-  function highlightThumb(i){
-    Array.from(thumbs.children).forEach((c,idx)=> {
-      c.classList.toggle('active', idx===i);
-      if (idx === i) {
-        c.scrollIntoView({behavior: 'smooth', inline: "nearest", block: "nearest"});
-      }
-    });
-  }
-
-  function goToImage(i){ currentIndex = (i + currentImages.length) % currentImages.length; setViewerImage(currentImages[currentIndex]); }
-  function nextImage(){ goToImage(currentIndex+1); }
-  function prevImage(){ goToImage(currentIndex-1); }
-
-  closeBtn.addEventListener('click', closeGallery);
-
-  modal.addEventListener('click', e=>{ if(e.target === modal) closeGallery(); });
-  window.addEventListener('keydown', e=>{
-    if(modal.classList.contains('open')){
-      if(e.key === 'Escape') closeGallery();
-      if(e.key === 'ArrowRight') nextImage();
-      if(e.key === 'ArrowLeft') prevImage();
-    }
-  });
-
-  function closeGallery(){ modal.classList.remove('open'); viewerImg.src=''; viewerImg.srcset=''; currentImages = []; disableSwipe(); }
-
-  let touchStartX = 0, touchStartY = 0, touchMoveX = 0, touchMoveY = 0;
-  const SWIPE_THRESHOLD = 40;
-
-  function handleTouchStart(e){
-    if(!e.touches || !e.touches.length) return;
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    touchMoveX = 0; touchMoveY = 0;
-  }
-  function handleTouchMove(e){
-    if(!e.touches || !e.touches.length) return;
-    touchMoveX = e.touches[0].clientX - touchStartX;
-    touchMoveY = e.touches[0].clientY - touchStartY;
-    if (Math.abs(touchMoveX) > 10 && Math.abs(touchMoveX) > Math.abs(touchMoveY)) {
-      e.preventDefault();
-    }
-  }
-  function handleTouchEnd(){
-    const dx = touchMoveX, dy = touchMoveY;
-    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD){
-      if(dx < 0) nextImage();
-      else prevImage();
-    }
-    touchStartX = touchStartY = touchMoveX = touchMoveY = 0;
-  }
-
-  function enableSwipe(){
-    const v = document.querySelector('.viewer');
-    if(!v._swipeEnabled){
-      v.addEventListener('touchstart', handleTouchStart, {passive:false});
-      v.addEventListener('touchmove', handleTouchMove, {passive:false});
-      v.addEventListener('touchend', handleTouchEnd, {passive:false});
-      v._swipeEnabled = true;
-    }
-  }
-  function disableSwipe(){
-    const v = document.querySelector('.viewer');
-    if(v && v._swipeEnabled){
-      v.removeEventListener('touchstart', handleTouchStart);
-      v.removeEventListener('touchmove', handleTouchMove);
-      v.removeEventListener('touchend', handleTouchEnd);
-      v._swipeEnabled = false;
     }
   }
 
